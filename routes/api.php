@@ -5,6 +5,7 @@ require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/VehiculosController.php';
 require_once __DIR__ . '/../controllers/CitasController.php';
 require_once __DIR__ . '/../controllers/DashboardController.php';
+require_once __DIR__ . '/../controllers/PerfilController.php';
 
 $request = $_SERVER['REQUEST_URI'];
 $method  = $_SERVER['REQUEST_METHOD'];
@@ -77,6 +78,13 @@ if (str_contains($request, "dashboard")) {
 if ($method === "POST" && str_contains($request, "desglose") && $id) {
     $citas->updateDesglose($id);
     return;
+}
+
+/* PERFIL */
+$perfil = new PerfilController();
+if (str_contains($request, "perfil")) {
+    if ($method === "GET")  { $perfil->getPerfil();    return; }
+    if ($method === "PUT")  { $perfil->updatePerfil(); return; }
 }
 
 /* NO ENCONTRADO */
