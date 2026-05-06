@@ -6,6 +6,7 @@ require_once __DIR__ . '/../controllers/VehiculosController.php';
 require_once __DIR__ . '/../controllers/CitasController.php';
 require_once __DIR__ . '/../controllers/DashboardController.php';
 require_once __DIR__ . '/../controllers/PerfilController.php';
+require_once __DIR__ . '/../controllers/BusquedaController.php';
 
 $request = $_SERVER['REQUEST_URI'];
 $method  = $_SERVER['REQUEST_METHOD'];
@@ -85,6 +86,12 @@ $perfil = new PerfilController();
 if (str_contains($request, "perfil")) {
     if ($method === "GET")  { $perfil->getPerfil();    return; }
     if ($method === "PUT")  { $perfil->updatePerfil(); return; }
+}
+
+/* BUSQUEDA */
+$busqueda = new BusquedaController();
+if (str_contains($request, "buscar")) {
+    if ($method === "GET") { $busqueda->buscar(); return; }
 }
 
 /* NO ENCONTRADO */
