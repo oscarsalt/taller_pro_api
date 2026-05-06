@@ -37,31 +37,34 @@ class DashboardController {
         echo json_encode($data);
     }
 
-    public function citasSemana() {
-        $db  = $this->getDB();
-        $uid = $GLOBALS['id_usuario'];
+  public function citasSemana() {
+    $db  = $this->getDB();
+    $uid = $GLOBALS['id_usuario'];
 
-        $stmt = $db->prepare(
-            "SELECT
-                c.id_cita,
-                c.fecha,
-                c.hora,
-                c.estado,
-                c.descripcion,
-                c.coste,
-                v.marca,
-                v.modelo,
-                v.matricula,
-                cl.nombre
-             FROM citas c
-             JOIN vehiculos v  ON c.id_vehiculo = v.id_vehiculo
-             JOIN clientes cl  ON c.id_cliente  = cl.id_cliente
-             WHERE c.id_usuario = ?
-             AND c.fecha BETWEEN DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
-             AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)
-             ORDER BY c.fecha, c.hora"
-        );
-        $stmt->execute([$uid]);
-        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
-    }
+    // Recibir fechas desde el frontend
+    $inicio = $_GET['inicio'] ?? date('Y-m-d', strtotime('monday this week'));
+    $fin    = $_GET['fin']    ?? date('Y-m-d', strtotime('sunday this week'));
+
+    $stmt = $db->prepare(
+        "SELECT
+            c.id_cita,
+            c.fecha,
+            c.hora,
+            c.estado,
+            c.descripcion,
+            c.coste,
+            v.marca,
+            v.modelo,
+            v.matricula,
+            cl.nombre
+         FROM citas c
+         JOIN vehiculos v  ON c.id_vehiculo = v.id_vehiculo
+         JOIN clientes cl  ON c.id_cliente  = cl.id_cliente
+         WHERE c.id_usuario = ?
+         AND c.fecha BETWEEN ? AND ?
+         ORDER BY c.fecha, c.hora"
+    );
+    $stmt->execute([$uid, $inicio, $fin]);
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
 }

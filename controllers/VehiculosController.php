@@ -54,10 +54,40 @@ class VehiculosController {
         echo json_encode(["message" => "Vehículo creado"]);
     }
 
+public function updateVehiculo($id) {
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    if (!$data) {
+        http_response_code(400);
+        echo json_encode(["error" => "Datos inválidos"]);
+        return;
+    }
+
+    $db = $this->getDB();
+    $vehiculo = new Vehiculo($db);
+    $vehiculo->updateVehiculo($id, $data, $this->userId());
+
+    echo json_encode(["message" => "Vehículo actualizado"]);
+}
+
     public function deleteVehiculo($id) {
         $db = $this->getDB();
         $vehiculo = new Vehiculo($db);
         $vehiculo->deleteVehiculo($id, $this->userId());
         echo json_encode(["message" => "Vehículo eliminado"]);
     }
+
+public function getHistorial($id) {
+    $db = $this->getDB();
+    $stmt = $db->prepare(
+        "SELECT c.id_cita, c.fecha, c.hora, c.estado, c.descripcion,
+                c.mano_obra, c.piezas, c.otros, c.coste
+         FROM citas c
+         WHERE c.id_vehiculo = ? AND c.id_usuario = ?
+         ORDER BY c.fecha DESC, c.hora DESC"
+    );
+    $stmt->execute([$id, $this->userId()]);
+    $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($citas);
+}
 }

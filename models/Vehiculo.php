@@ -38,4 +38,20 @@ class Vehiculo {
         $stmt = $this->conn->prepare("DELETE FROM vehiculos WHERE id_vehiculo = ? AND id_usuario = ?");
         return $stmt->execute([$id, $id_usuario]);
     }
+
+public function updateVehiculo($id, $data, $id_usuario) {
+    $stmt = $this->conn->prepare(
+        "UPDATE vehiculos SET id_cliente = ?, marca = ?, modelo = ?, matricula = ?, anio = ?
+         WHERE id_vehiculo = ? AND id_usuario = ?"
+    );
+    return $stmt->execute([
+        $data["id_cliente"],
+        $data["marca"],
+        $data["modelo"]   ?? null,
+        $data["matricula"],
+        $data["anio"]     ?? null,
+        $id,
+        $id_usuario
+    ]);
+}
 }

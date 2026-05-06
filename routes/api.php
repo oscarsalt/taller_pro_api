@@ -9,12 +9,15 @@ require_once __DIR__ . '/../controllers/DashboardController.php';
 $request = $_SERVER['REQUEST_URI'];
 $method  = $_SERVER['REQUEST_METHOD'];
 
-$request = explode("?", $request)[0];
 $segments = explode("/", trim($request, "/"));
-
 $id = null;
-if (isset($segments[count($segments) - 1]) && is_numeric($segments[count($segments) - 1])) {
-    $id = $segments[count($segments) - 1];
+
+// Buscar el primer segmento numérico en lugar del último
+foreach ($segments as $segment) {
+    if (is_numeric($segment)) {
+        $id = $segment;
+        break;
+    }
 }
 
 $clientes  = new ClientesController();
@@ -38,9 +41,11 @@ if (str_contains($request, "clientes")) {
 
 /* VEHICULOS */
 if (str_contains($request, "vehiculos")) {
+    if ($method === "GET" && str_contains($request, "historial") && $id) { $vehiculos->getHistorial($id); return; }
     if ($method === "GET"    && !$id) { $vehiculos->getVehiculos();      return; }
     if ($method === "GET"    &&  $id) { $vehiculos->getVehiculo($id);    return; }
     if ($method === "POST")           { $vehiculos->createVehiculo();    return; }
+    if ($method === "PUT" && $id)     { $vehiculos->updateVehiculo($id); return; }
     if ($method === "DELETE" &&  $id) { $vehiculos->deleteVehiculo($id); return; }
 }
 
@@ -52,6 +57,7 @@ if (str_contains($request, "citas")) {
     if ($method === "GET"    && !$id) { $citas->getCitas();      return; }
     if ($method === "GET"    &&  $id) { $citas->getCita($id);    return; }
     if ($method === "POST")           { $citas->createCita();    return; }
+    if ($method === "PUT" && $id)     { $citas->updateCita($id); return; }
     if ($method === "DELETE" &&  $id) { $citas->deleteCita($id); return; }
 }
 

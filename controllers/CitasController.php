@@ -35,6 +35,21 @@ class CitasController {
         echo json_encode($result);
     }
 
+public function updateCita($id) {
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    if (!$data) {
+        http_response_code(400);
+        echo json_encode(["error" => "Datos inválidos"]);
+        return;
+    }
+
+    $cita = new Cita($this->conn);
+    $cita->updateCita($id, $data, $this->userId());
+
+    echo json_encode(["message" => "Cita actualizada"]);
+}
+
     public function createCita() {
         $data = json_decode(file_get_contents("php://input"), true);
 

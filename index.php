@@ -22,8 +22,22 @@ $esPublica = (str_contains($request, "login") || str_contains($request, "registe
 
 if (!$esPublica) {
 
-    $headers = getallheaders();
-    $authHeader = $headers['Authorization'] ?? '';
+    // Fix para XAMPP que a veces no pasa el header Authorization
+    $authHeader = '';
+
+    if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+    } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    } else {
+        $allHeaders = getallheaders();
+        foreach ($allHeaders as $key => $value) {
+            if (strtolower($key) === 'authorization') {
+                $authHeader = $value;
+                break;
+            }
+        }
+    }
 
     if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
         http_response_code(401);
@@ -41,7 +55,6 @@ if (!$esPublica) {
         echo json_encode(["error" => "Token inválido o expirado"]);
         exit();
     }
-
 }
 
 require_once "routes/api.php";

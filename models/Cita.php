@@ -94,6 +94,29 @@ public function createCita($data, $id_usuario) {
         return $stmt->execute([$coste, $id, $id_usuario]);
     }
 
+public function updateCita($id, $data, $id_usuario) {
+    $stmt = $this->conn->prepare(
+        "UPDATE citas SET fecha = ?, hora = ?, descripcion = ?, mano_obra = ?, piezas = ?, otros = ?, coste = ?
+         WHERE id_cita = ? AND id_usuario = ?"
+    );
+    $mano_obra = (float)($data["mano_obra"] ?? 0);
+    $piezas    = (float)($data["piezas"]    ?? 0);
+    $otros     = (float)($data["otros"]     ?? 0);
+    $coste     = round(($mano_obra + $piezas + $otros) * 1.21, 2);
+
+    return $stmt->execute([
+        $data["fecha"],
+        $data["hora"],
+        $data["descripcion"] ?? null,
+        $mano_obra,
+        $piezas,
+        $otros,
+        $coste,
+        $id,
+        $id_usuario
+    ]);
+}
+
     public function deleteCita($id, $id_usuario) {
         $stmt = $this->conn->prepare("DELETE FROM citas WHERE id_cita = ? AND id_usuario = ?");
         return $stmt->execute([$id, $id_usuario]);
