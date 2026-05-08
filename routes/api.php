@@ -34,6 +34,7 @@ if (str_contains($request, "login")    && $method === "POST") { $auth->login(); 
 
 /* CLIENTES */
 if (str_contains($request, "clientes")) {
+    if ($method === "GET" && str_contains($request, "historial") && $id) { $clientes->getHistorial($id); return; }
     if ($method === "GET"    && !$id) { $clientes->getClientes();      return; }
     if ($method === "GET"    &&  $id) { $clientes->getCliente($id);    return; }
     if ($method === "POST")           { $clientes->createCliente();    return; }
@@ -93,6 +94,7 @@ $busqueda = new BusquedaController();
 if (str_contains($request, "buscar")) {
     if ($method === "GET") { $busqueda->buscar(); return; }
 }
+
 
 /* NO ENCONTRADO */
 http_response_code(404);

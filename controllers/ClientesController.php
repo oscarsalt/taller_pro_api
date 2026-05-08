@@ -50,4 +50,19 @@ class ClientesController {
         $cliente->updateCliente($id, $data, $this->userId());
         echo json_encode(["message" => "Cliente actualizado"]);
     }
+
+public function getHistorial($id) {
+    $db  = $this->getDB();
+    $stmt = $db->prepare(
+        "SELECT c.id_cita, c.fecha, c.hora, c.estado, c.descripcion,
+                c.mano_obra, c.piezas, c.otros, c.coste, c.presupuesto,
+                v.marca, v.modelo, v.matricula
+         FROM citas c
+         JOIN vehiculos v ON c.id_vehiculo = v.id_vehiculo
+         WHERE c.id_cliente = ? AND c.id_usuario = ?
+         ORDER BY c.fecha DESC, c.hora DESC"
+    );
+    $stmt->execute([$id, $GLOBALS['id_usuario']]);
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
 }
